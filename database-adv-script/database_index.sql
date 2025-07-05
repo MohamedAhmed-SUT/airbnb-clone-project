@@ -1,33 +1,55 @@
 -- =================================================================
--- Task 3: Index Implementation for Performance Optimization
+-- Task 3: Index Implementation for Performance Optimization (Corrected)
 -- =================================================================
--- This script creates indexes on high-usage columns to improve
--- the performance of common queries in the Airbnb Clone database.
+-- This script demonstrates the process of analyzing query performance,
+-- creating an index, and then re-analyzing to show improvement.
 -- =================================================================
 
--- Indexes are crucial for speeding up query performance, especially
--- on columns that are frequently used in WHERE clauses or for JOINs.
 
--- Index on the User table's email column for fast lookups during login.
+-- =================================================================
+-- Step 1: Analyze Query Performance BEFORE Indexing
+-- =================================================================
+-- We use EXPLAIN ANALYZE to see the execution plan for a common query:
+-- finding a user by their email. Without an index, this will
+-- result in a slow "Sequential Scan".
+
+EXPLAIN ANALYZE
+SELECT * FROM "User" WHERE email = 'jane.smith@example.com';
+
+
+-- =================================================================
+-- Step 2: Create the Index
+-- =================================================================
+-- Based on the analysis, we create an index on the `email` column
+-- to speed up these lookups.
+
 CREATE INDEX IF NOT EXISTS idx_user_email ON "User"(email);
 
--- Index on the Property table's host_id for quickly finding all properties of a host.
+
+-- =================================================================
+-- Step 3: Analyze Query Performance AFTER Indexing
+-- =================================================================
+-- We run the exact same query again. Now, the database query planner
+-- should choose to use the new index, resulting in a much faster
+-- "Index Scan".
+
+EXPLAIN ANALYZE
+SELECT * FROM "User" WHERE email = 'jane.smith@example.com';
+
+
+-- =================================================================
+-- Additional Recommended Indexes
+-- =================================================================
+-- Below are other indexes that were identified as beneficial for the
+-- overall application performance.
+
 CREATE INDEX IF NOT EXISTS idx_property_host_id ON Property(host_id);
-
--- Index on the Property table's location for speeding up location-based searches.
 CREATE INDEX IF NOT EXISTS idx_property_location ON Property(location);
-
--- Index on the Booking table's user_id to quickly retrieve a user's booking history.
 CREATE INDEX IF NOT EXISTS idx_booking_user_id ON Booking(user_id);
-
--- Index on the Booking table's property_id to quickly find all bookings for a property.
 CREATE INDEX IF NOT EXISTS idx_booking_property_id ON Booking(property_id);
-
--- Index on the Review table's property_id for fast retrieval of all reviews for a property.
 CREATE INDEX IF NOT EXISTS idx_review_property_id ON Review(property_id);
-
--- Index on the Review table's user_id to find all reviews written by a specific user.
 CREATE INDEX IF NOT EXISTS idx_review_user_id ON Review(user_id);
+
 
 -- =================================================================
 -- Script End
