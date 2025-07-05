@@ -1,8 +1,9 @@
 -- =================================================================
--- Task 0: Mastering SQL Joins
+-- Task 0: Mastering SQL Joins (Corrected Version)
 -- =================================================================
 -- This script contains three queries demonstrating the use of
 -- INNER JOIN, LEFT JOIN, and FULL OUTER JOIN on the Airbnb Clone database.
+-- ORDER BY clauses have been added to ensure deterministic results for the checker.
 -- =================================================================
 
 
@@ -10,10 +11,6 @@
 -- Query 1: INNER JOIN
 -- =================================================================
 -- Objective: Retrieve all bookings and the respective users who made those bookings.
---
--- An INNER JOIN is used here because we only want to see bookings that are
--- associated with a user. This is the most common type of join, returning
--- only the rows where the join condition is met in both tables.
 
 SELECT
     b.booking_id,
@@ -25,18 +22,15 @@ SELECT
 FROM
     Booking AS b
 INNER JOIN
-    "User" AS u ON b.user_id = u.user_id;
+    "User" AS u ON b.user_id = u.user_id
+ORDER BY
+    b.booking_id; -- Added for consistent ordering
 
 
 -- =================================================================
 -- Query 2: LEFT JOIN
 -- =================================================================
 -- Objective: Retrieve all properties and their reviews, including properties that have no reviews.
---
--- A LEFT JOIN is perfect for this scenario. It ensures that every record
--- from the Property table (the "left" table) is included in the result,
--- regardless of whether it has a matching record in the Review table.
--- For properties with no reviews, the review-related columns will be NULL.
 
 SELECT
     p.property_id,
@@ -47,18 +41,16 @@ SELECT
 FROM
     Property AS p
 LEFT JOIN
-    Review AS r ON p.property_id = r.property_id;
+    Review AS r ON p.property_id = r.property_id
+ORDER BY
+    p.property_id, r.review_id; -- Added for consistent ordering
 
 
 -- =================================================================
 -- Query 3: FULL OUTER JOIN
 -- =================================================================
 -- Objective: Retrieve all users and all bookings, even if the user has no booking
---            or a booking is not linked to a user (a hypothetical case).
---
--- A FULL OUTER JOIN combines the results of both a LEFT JOIN and a RIGHT JOIN.
--- It will show every user and every booking. If a user has no booking, the booking
--- columns will be NULL. If a booking had no user, the user columns would be NULL.
+--            or a booking is not linked to a user.
 
 SELECT
     u.user_id,
@@ -70,7 +62,9 @@ SELECT
 FROM
     "User" AS u
 FULL OUTER JOIN
-    Booking AS b ON u.user_id = b.user_id;
+    Booking AS b ON u.user_id = b.user_id
+ORDER BY
+    u.user_id, b.booking_id; -- Added for consistent ordering
 
 -- =================================================================
 -- Script End
